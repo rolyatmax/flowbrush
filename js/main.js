@@ -23,8 +23,13 @@ function scaleToFill(t, e, i, n) {
     };
 }
 
+var IMG_COUNT = 18;
+
+var num = Math.round(Math.random() * IMG_COUNT);
+
 var img = document.createElement('img');
-img.src = '/img/23.jpg';
+img.src = '/img/' + num + '.jpg';
+// img.src = '/img/1.png';
 img.onload = main;
 
 function main() {
@@ -78,19 +83,19 @@ function main() {
         wander: true,
         decay: 0.9
     })];
-    setTimeout(brushes[0].start.bind(brushes[0]), 1500);
-    brushes[0].on('complete', function() {
-        brushes[1].start();
-        brushes[2].start();
-        brushes[3].start();
-        brushes[6].start();
-    });
-    brushes[2].on('complete', function() {
-        brushes[4].start();
-    });
-    brushes[4].on('complete', function() {
-        brushes[5].start();
-    });
+    setTimeout(brushes[1].start.bind(brushes[0]), 150);
+    // brushes[0].on('complete', function() {
+        // brushes[1].start();
+        // brushes[2].start();
+        // brushes[3].start();
+        // brushes[6].start();
+    // });
+    // brushes[2].on('complete', function() {
+        // brushes[4].start();
+    // });
+    // brushes[4].on('complete', function() {
+        // brushes[5].start();
+    // });
     tween.set(canvas, {
         transformOrigin: 'top left'
     });

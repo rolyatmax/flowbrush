@@ -27,10 +27,10 @@ module.exports = function(canvas, ctx, img, opts) {
     var color;
     var vec = new Vec2D();
     var pVec = new VParticle();
-    var expired = [];
+    var removed = [];
     var drawDrops = function() {
         physics.update();
-        var particles = [];
+        var toRemove = [];
         for (var i = 0, len = physics.particles.length; len > i; i++) {
             var particle = physics.particles[i];
             if (particle.isInRectangle(rect) && particle.radius > 0) {
@@ -44,16 +44,16 @@ module.exports = function(canvas, ctx, img, opts) {
                 ctx.closePath();
                 ctx.fill();
             } else {
-                particles.push(particle);
+                toRemove.push(particle);
             }
             if (opts.wander) {
                 vec = vectorField.atCell(imagePixel.imageData, Math.floor(particle.x), Math.floor(particle.y), vec);
                 particle.addForce(vec.scaleSelf(0.05));
             }
         }
-        for (len = particles.length, i = 0; len > i; i++) {
-            physics.removeParticle(particles[i]);
-            expired.push(particles[i]);
+        for (len = toRemove.length, i = 0; len > i; i++) {
+            physics.removeParticle(toRemove[i]);
+            removed.push(toRemove[i]);
         }
     };
     var brush = animitter(function() {
