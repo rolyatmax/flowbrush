@@ -28,8 +28,8 @@ var IMG_COUNT = 18;
 var num = Math.round(Math.random() * IMG_COUNT);
 
 var img = document.createElement('img');
-img.src = '/img/' + num + '.jpg';
-// img.src = '/img/1.png';
+img.src = 'img/' + num + '.jpg';
+// img.src = 'img/1.png';
 img.onload = main;
 
 function main() {
