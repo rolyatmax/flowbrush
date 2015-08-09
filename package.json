@@ -1,0 +1,31 @@
+{
+  "name": "flowbrush",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js/main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rolyatmax/flowbrush.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rolyatmax/flowbrush/issues"
+  },
+  "homepage": "https://github.com/rolyatmax/flowbrush#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "mkdir -p build && node_modules/.bin/watchify js/main.js -o build/build.js -v",
+    "build": "mkdir -p build && node_modules/.bin/browserify js/main.js -o build/build.js",
+    "serve": "python -m SimpleHTTPServer 8989"
+  },
+  "author": "Taylor Baldwin <taylorbaldwin@gmail.com> (https://tbaldw.in)",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-eslint": "^4.0.0",
+    "browserify": "^11.0.0",
+    "eslint": "^0.24.1",
+    "watchify": "^3.3.0"
+  },
+  "dependencies": {
+    "animitter": "^0.5.0"
+  }
+}
