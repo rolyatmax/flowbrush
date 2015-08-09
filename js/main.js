@@ -84,18 +84,18 @@ function main() {
         decay: 0.9
     })];
     setTimeout(brushes[1].start.bind(brushes[0]), 150);
-    // brushes[0].on('complete', function() {
-        // brushes[1].start();
-        // brushes[2].start();
-        // brushes[3].start();
-        // brushes[6].start();
-    // });
-    // brushes[2].on('complete', function() {
-        // brushes[4].start();
-    // });
-    // brushes[4].on('complete', function() {
-        // brushes[5].start();
-    // });
+    brushes[0].on('complete', function() {
+        brushes[1].start();
+        brushes[2].start();
+        brushes[3].start();
+        brushes[6].start();
+    });
+    brushes[2].on('complete', function() {
+        brushes[4].start();
+    });
+    brushes[4].on('complete', function() {
+        brushes[5].start();
+    });
     tween.set(canvas, {
         transformOrigin: 'top left'
     });
