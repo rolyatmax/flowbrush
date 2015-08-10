@@ -6,35 +6,35 @@ var canvas = document.createElement('canvas');
 var ctx = canvas.getContext('2d');
 document.querySelector('.container').appendChild(canvas);
 
-function scaleToFill(t, e, i, n) {
+function scaleToFill(imgWidth, imgHeight, containerWidth, containerHeight) {
     if (arguments.length === 2) {
-        n = e.height;
-        i = e.width;
-        e = t.height;
-        t = t.width;
+        containerHeight = imgHeight.height;
+        containerWidth = imgHeight.width;
+        imgHeight = imgWidth.height;
+        imgWidth = imgWidth.width;
     }
-    var width = Math.max(i, t * (n / e));
-    var height = Math.max(n, e * (i / t));
+    var width = Math.max(containerWidth, imgWidth * (containerHeight / imgHeight));
+    var height = Math.max(containerHeight, imgHeight * (containerWidth / imgWidth));
     return {
-        x: -((width - i) / 2),
-        y: -((height - n) / 2),
+        x: -((width - containerWidth) / 2),
+        y: -((height - containerHeight) / 2),
         width: width,
         height: height
     };
 }
 
-var IMG_COUNT = 18;
+var IMG_COUNT = 16;
 
 var num = Math.round(Math.random() * IMG_COUNT);
 
 var img = document.createElement('img');
 img.src = 'img/' + num + '.jpg';
-// img.src = 'img/1.png';
+// img.src = 'img/3.png';
 img.onload = main;
 
 function main() {
-    var l = scaleToFill(img.width, img.height, window.innerWidth - 2 * 10, 1.2 * window.innerHeight);
-    var imgCanvas = resizedCanvasSync(img, l);
+    var dimensions = scaleToFill(img.width, img.height, window.innerWidth - 2 * 10, 1.2 * window.innerHeight);
+    var imgCanvas = resizedCanvasSync(img, dimensions);
 
     canvas.width = imgCanvas.width;
     canvas.height = imgCanvas.height;
@@ -49,41 +49,42 @@ function main() {
         iterations: 1,
         duration: Math.floor(0.5 * canvas.width),
         alpha: 0.025,
-        radius: 140
+        radius: 140,
+        decay: 0.95
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.75 * canvas.width),
+        duration: Math.floor(1.75 * canvas.width),
         alpha: 0.25,
         radius: 20,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.33 * canvas.width),
+        duration: Math.floor(1.33 * canvas.width),
         alpha: 0.025,
         radius: 15,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.2 * canvas.width),
+        duration: Math.floor(2.5 * canvas.width),
         alpha: 0.25,
         radius: 10,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 8,
-        duration: Math.floor(1 * canvas.width),
+        duration: Math.floor(2.5 * canvas.width),
         alpha: 0.25,
         radius: 10,
         wander: false,
-        decay: 0.9
+        decay: 0.93
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 8,
-        duration: Math.floor(1.2 * canvas.width),
+        duration: Math.floor(3.2 * canvas.width),
         alpha: 0.35,
         radius: 8,
         wander: true,
-        decay: 0.9
+        decay: 0.92
     })];
-    setTimeout(brushes[1].start.bind(brushes[0]), 150);
+    setTimeout(brushes[0].start.bind(brushes[0]), 150);
     brushes[0].on('complete', function() {
         brushes[1].start();
         brushes[2].start();

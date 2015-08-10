@@ -1967,35 +1967,35 @@ var canvas = document.createElement('canvas');
 var ctx = canvas.getContext('2d');
 document.querySelector('.container').appendChild(canvas);
 
-function scaleToFill(t, e, i, n) {
+function scaleToFill(imgWidth, imgHeight, containerWidth, containerHeight) {
     if (arguments.length === 2) {
-        n = e.height;
-        i = e.width;
-        e = t.height;
-        t = t.width;
+        containerHeight = imgHeight.height;
+        containerWidth = imgHeight.width;
+        imgHeight = imgWidth.height;
+        imgWidth = imgWidth.width;
     }
-    var width = Math.max(i, t * (n / e));
-    var height = Math.max(n, e * (i / t));
+    var width = Math.max(containerWidth, imgWidth * (containerHeight / imgHeight));
+    var height = Math.max(containerHeight, imgHeight * (containerWidth / imgWidth));
     return {
-        x: -((width - i) / 2),
-        y: -((height - n) / 2),
+        x: -((width - containerWidth) / 2),
+        y: -((height - containerHeight) / 2),
         width: width,
         height: height
     };
 }
 
-var IMG_COUNT = 18;
+var IMG_COUNT = 16;
 
 var num = Math.round(Math.random() * IMG_COUNT);
 
 var img = document.createElement('img');
 img.src = 'img/' + num + '.jpg';
-// img.src = 'img/1.png';
+// img.src = 'img/3.png';
 img.onload = main;
 
 function main() {
-    var l = scaleToFill(img.width, img.height, window.innerWidth - 2 * 10, 1.2 * window.innerHeight);
-    var imgCanvas = resizedCanvasSync(img, l);
+    var dimensions = scaleToFill(img.width, img.height, window.innerWidth - 2 * 10, 1.2 * window.innerHeight);
+    var imgCanvas = resizedCanvasSync(img, dimensions);
 
     canvas.width = imgCanvas.width;
     canvas.height = imgCanvas.height;
@@ -2010,41 +2010,42 @@ function main() {
         iterations: 1,
         duration: Math.floor(0.5 * canvas.width),
         alpha: 0.025,
-        radius: 140
+        radius: 140,
+        decay: 0.95
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.75 * canvas.width),
+        duration: Math.floor(1.75 * canvas.width),
         alpha: 0.25,
         radius: 20,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.33 * canvas.width),
+        duration: Math.floor(1.33 * canvas.width),
         alpha: 0.025,
         radius: 15,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
-        duration: Math.floor(0.2 * canvas.width),
+        duration: Math.floor(2.5 * canvas.width),
         alpha: 0.25,
         radius: 10,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 8,
-        duration: Math.floor(1 * canvas.width),
+        duration: Math.floor(2.5 * canvas.width),
         alpha: 0.25,
         radius: 10,
         wander: false,
-        decay: 0.9
+        decay: 0.93
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 8,
-        duration: Math.floor(1.2 * canvas.width),
+        duration: Math.floor(3.2 * canvas.width),
         alpha: 0.35,
         radius: 8,
         wander: true,
-        decay: 0.9
+        decay: 0.92
     })];
-    setTimeout(brushes[1].start.bind(brushes[0]), 150);
+    setTimeout(brushes[0].start.bind(brushes[0]), 150);
     brushes[0].on('complete', function() {
         brushes[1].start();
         brushes[2].start();
@@ -2097,42 +2098,46 @@ function grayscale(r, g, b) {
     return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-function vector(t, e) {
-    for (var s, o = [], a = 0; a < 3; a++) {
-        for (var l = 0; l < 3; l++) {
-            s = a + 3 * l * 4;
-            o.push(grayscale(t[s], t[s + 1], t[s + 2], t[s + 3]));
+function vector(pixels, copyTo) {
+    var i;
+    var neighbors = [];
+    for (var j = 0; j < 3; j++) {
+        for (var k = 0; k < 3; k++) {
+            i = j + 3 * k * 4;
+            neighbors.push(grayscale(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]));
         }
     }
-    var c = average(o[0], o[3], o[6]);
-    var u = average(o[2], o[5], o[8]);
-    var h = c - u;
-    var d = average(o[0], o[1], o[2]);
-    var p = average(o[6], o[7], o[8]);
-    var f = d - p;
-    return e ? (e.x = h, e.y = f, e) : new Vec2D(h, f);
+    var west = average(neighbors[0], neighbors[3], neighbors[6]);
+    var east = average(neighbors[2], neighbors[5], neighbors[8]);
+    var x = west - east;
+    var north = average(neighbors[0], neighbors[1], neighbors[2]);
+    var south = average(neighbors[6], neighbors[7], neighbors[8]);
+    var y = north - south;
+    return copyTo ? (copyTo.x = x, copyTo.y = y, copyTo) : new Vec2D(x, y);
 }
 
-function index(t, e, i) {
-    return 4 * (e + i * t.width);
+function index(imgData, x, y) {
+    return 4 * (x + y * imgData.width);
 }
 
-function getCell(t, i, n) {
-    for (var r = new Uint8Array(36), s = 0, o = -1; o < 2; o++) {
-        for (var a = -1; a < 2; a++) {
-            var l = index(t, i + o, n + a);
-            r[s] = t.data[l];
-            r[s + 1] = t.data[l + 1];
-            r[s + 2] = t.data[l + 2];
-            r[s + 3] = t.data[l + 3];
-            s += 4;
+function getCell(imgData, x, y) {
+    var neighbors = new Uint8Array(36);
+    var i = 0;
+    for (var xOffset = -1; xOffset < 2; xOffset++) {
+        for (var yOffset = -1; yOffset < 2; yOffset++) {
+            var idx = index(imgData, x + xOffset, y + yOffset);
+            neighbors[i] = imgData.data[idx];
+            neighbors[i + 1] = imgData.data[idx + 1];
+            neighbors[i + 2] = imgData.data[idx + 2];
+            neighbors[i + 3] = imgData.data[idx + 3];
+            i += 4;
         }
     }
-    return r;
+    return neighbors;
 }
 
-function atCell(t, i, n, r) {
-    return vector(getCell(t, i, n), r);
+function atCell(imgData, x, y, copyTo) {
+    return vector(getCell(imgData, x, y), copyTo);
 }
 
 module.exports = {
