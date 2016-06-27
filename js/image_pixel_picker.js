@@ -18,12 +18,6 @@ module.exports = function(img) {
 
     var canvas = canvasSync(img);
     var imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-    var color = {
-        red: 0,
-        green: 0,
-        blue: 0,
-        alpha: 0
-    };
 
     return {
         canvas: canvas,

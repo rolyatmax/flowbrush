@@ -48,7 +48,7 @@ module.exports = function(canvas, ctx, img, opts) {
             }
             if (opts.wander) {
                 vec = vectorField.atCell(imagePixel.imageData, Math.floor(particle.x), Math.floor(particle.y), vec);
-                particle.addForce(vec.scaleSelf(0.05));
+                particle.addForce(vec.scaleSelf(0.005));
             }
         }
         for (len = toRemove.length, i = 0; len > i; i++) {

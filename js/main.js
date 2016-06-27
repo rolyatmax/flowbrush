@@ -52,10 +52,10 @@ function main() {
         radius: 140,
         decay: 0.95
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
-        iterations: 1,
-        duration: Math.floor(1.75 * canvas.width),
+        iterations: 999,
+        duration: Math.floor(25.75 * canvas.width),
         alpha: 0.25,
-        radius: 20,
+        radius: 5,
         wander: true
     }), flowBrush(imgCanvas, ctx, imgCanvas, {
         iterations: 1,
@@ -89,13 +89,13 @@ function main() {
         brushes[1].start();
         brushes[2].start();
         brushes[3].start();
-        brushes[6].start();
+        // brushes[6].start();
     });
     brushes[2].on('complete', function() {
         brushes[4].start();
-    });
-    brushes[4].on('complete', function() {
-        brushes[5].start();
+    // });
+    // brushes[4].on('complete', function() {
+        // brushes[5].start();
     });
     tween.set(canvas, {
         transformOrigin: 'top left'
